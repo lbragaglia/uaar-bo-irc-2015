@@ -17,9 +17,9 @@ $(document).ready(function() {
 
 	var map = L.map('map').setView([44.494887, 11.342616], 13);
 
-	var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+	var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 	var osmAttrib =
-		'Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> contributors';
+		'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
 	var baseLayer = new L.TileLayer(osmUrl, {
 		minZoom: 8,
 		maxZoom: 17,
