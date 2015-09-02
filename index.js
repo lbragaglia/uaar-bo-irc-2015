@@ -17,19 +17,24 @@ $(document).ready(function() {
 
 	var map = L.map('map').setView([44.494887, 11.342616], 13);
 
+	var minZoom = 12;
+	var maxZoom = 17;
 	var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 	var osmAttrib =
 		'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
 	var baseLayer = new L.TileLayer(osmUrl, {
-		minZoom: 12,
-		maxZoom: 17,
+		minZoom: minZoom,
+		maxZoom: maxZoom,
 		attribution: osmAttrib
 	});
 	baseLayer.addTo(map);
 
 	var stamenLayer = new L.StamenTileLayer('toner', {
 		detectRetina: true
-	}).addTo(map);
+	}).setUrl('//stamen-tiles-{s}a.ssl.fastly.net/toner/{z}/{x}/{y}.png');
+	stamenLayer.options.minZoom = minZoom;
+	stamenLayer.options.maxZoom = maxZoom;
+	stamenLayer.addTo(map);
 
 	var layerControl = L.control.layers({
 		'OpenStreetMap': baseLayer,
