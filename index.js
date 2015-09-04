@@ -170,6 +170,7 @@ $(document).ready(function() {
 		"Scuole secondarie di primo grado").addLayer(medieLayer);
 
 	var legendControl = L.control.legend({
+		autoAdd: false,
 		gradient: true
 	}).addTo(map);
 	legendControl.addLayer(infanziaLayer);
