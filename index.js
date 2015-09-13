@@ -96,13 +96,13 @@ $(document).ready(function() {
 	});
 	var fillColorFunc = new L.PiecewiseFunction([
 		new L.HSLLuminosityFunction([0, 0], [1, 0]),
-		new L.HSLHueFunction([1, 0], [100, 240])
+		new L.HSLHueFunction([1, 0], [100, 180])
 	]);
 
 	var layerOptions = {
 		fillOpacity: 0.7,
 		opacity: 1,
-		weight: 1,
+		weight: 0.5,
 		color: 'hsl(220,100%,25%)',
 		numberOfSides: 40,
 		dropShadow: true,
@@ -117,6 +117,7 @@ $(document).ready(function() {
 			},
 			radius: radiusFunc
 		},
+		/*
 		'stranieri_perc': {
 			displayName: 'Stranieri',
 			displayText: function(value) {
@@ -124,6 +125,7 @@ $(document).ready(function() {
 			},
 			weight: new L.LinearFunction([0, 0.1], [100, 6])
 		},
+		*/
 		'non_freq_perc': {
 			displayName: 'Non freq.',
 			displayText: function(value) {
@@ -141,8 +143,8 @@ $(document).ready(function() {
 		layerOptions: layerOptions,
 		displayOptions: displayOptions,
 		tooltipOptions: {
-			iconSize: new L.Point(100, 108),
-			iconAnchor: new L.Point(-5, 54)
+			iconSize: new L.Point(90, 86),
+			iconAnchor: new L.Point(-15, 43)
 		},
 		onEachRecord: tablePopupBuilder
 	};
@@ -151,26 +153,80 @@ $(document).ready(function() {
 		filter: byServizio("SCUOLA DELL'INFANZIA")
 	});
 	var infanziaLayer = L.dataLayer(scuoleData, infanzia);
-	createLayerGroup(
-		"Scuole dell'infanzia").addLayer(infanziaLayer);
 
 	var primaria = L.extend({}, options, {
 		filter: byServizio("SCUOLA PRIMARIA"),
 	});
 	var primariaLayer = L.dataLayer(scuoleData, primaria);
-	createLayerGroup(
-		"Scuole primarie").addLayer(primariaLayer);
 
 	var medieOptions = L.extend({}, options, {
 		filter: byServizio("SCUOLA SECONDARIA DI PRIMO GRADO"),
-		displayOptions: displayOptions
+		//displayOptions: displayOptions
 	});
 	var medieLayer = new L.DataLayer(scuoleData, medieOptions);
-	createLayerGroup(
-		"Scuole secondarie di primo grado").addLayer(medieLayer);
+
+	createLayerGroup("Scuole secondarie di primo grado").addLayer(medieLayer);
+	createLayerGroup("Scuole primarie").addLayer(primariaLayer);
+	createLayerGroup("Scuole dell'infanzia").addLayer(infanziaLayer);
+
+	var minHue = 60;
+	var maxHue = 180;
+	var stranieriOptions = L.extend({}, options, {
+		filter: function(record) {
+			return record.stud && record.stranieri;
+		},
+		layerOptions: L.extend({}, layerOptions, {
+			fillOpacity: 0.9,
+			radius: 30,
+			barThickness: 10,
+			maxDegrees: 360,
+			rotation: 0,
+			numSegments: 10
+		}),
+		chartOptions: {
+			'stranieri_perc': {
+				displayName: 'Stranieri',
+				displayText: function(value) {
+					return value ? value.toFixed(1) + ' %' : 'n/d';
+				},
+				maxValue: 100,
+				minValue: 0
+			}
+		},
+		displayOptions: {
+			'stranieri_perc': {
+				displayName: 'Stranieri',
+				color: new L.HSLHueFunction([0, minHue], [100, maxHue], {
+					outputSaturation: '100%',
+					outputLuminosity: '25%'
+				}),
+				fillColor: new L.HSLHueFunction([0, minHue], [100, maxHue], {
+					outputSaturation: '100%',
+					outputLuminosity: '50%'
+				})
+			},
+			'Servizio': {
+				radius: function(value) {
+					if (value === "SCUOLA DELL'INFANZIA") {
+						return 10;
+					} else if (value === 'SCUOLA PRIMARIA') {
+						return 20;
+					} else /*if (value === "SCUOLA SECONDARIA DI PRIMO GRADO")*/ {
+						return 30;
+					}
+				}
+			}
+		}
+	});
+	var stranieriLayer = L.radialMeterMarkerDataLayer(scuoleData,
+		stranieriOptions);
+	var layerGroup = new L.LayerGroup().addLayer(stranieriLayer);
+	layerControl.addOverlay(layerGroup, "Stranieri");
 
 	var legendControl = L.control.legend({
 		gradient: true
 	}).addTo(map);
 	legendControl.addLayer(infanziaLayer);
+	legendControl.addLayer(
+		stranieriLayer);
 });
