@@ -224,6 +224,7 @@ $(document).ready(function() {
 	layerControl.addOverlay(layerGroup, "Stranieri");
 
 	var legendControl = L.control.legend({
+		autoAdd: false,
 		gradient: true
 	}).addTo(map);
 	legendControl.addLayer(infanziaLayer);
